@@ -1,7 +1,7 @@
 'use client';
 import { Inter, Roboto_Mono } from 'next/font/google';
-import "./globals.css";
 import ReduxProvider from "../components/ReduxProvider";
+import Navbar from './Components/Navbar';
 
 const sans = Inter({
   variable: "--font-sans",
