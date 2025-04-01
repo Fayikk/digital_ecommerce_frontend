@@ -5,16 +5,37 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX } from 'react-icons/fi'
 import styles from './Navbar.module.css'
-
+import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import { setSearchQuery } from '@/redux/slices/searchSlice'
 function Navbar() {
     const { data: categories, error, isLoading } = useGetMainCategoriesQuery();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
-
+    const dispatch = useDispatch();
+    const [searchQuery, setSearchValue] = useState('');
+    console.log("trigger searchQuery",searchQuery)
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-    const toggleSearch = () => setIsSearchOpen(!isSearchOpen);
+    const toggleSearch = () => {
+        console.log("trigger isSearchOpen",isSearchOpen)
+        setIsSearchOpen(!isSearchOpen);
+    }
 
+
+    const handleKey = (e) => {
+        e.preventDefault();
+        if (e.key === 'Enter') {
+        console.log("trigger Enter",searchQuery)
+
+            console.log("trigger hit enter",searchQuery)
+            setSearchValue(searchQuery);
+            console.log("trigger searchQuery",searchQuery)
+            dispatch(setSearchQuery(searchQuery))
+        }
+    }
+
+console.log(isMenuOpen)
     // Handle scroll effect for navbar
     useEffect(() => {
         const handleScroll = () => {
@@ -146,6 +167,8 @@ function Navbar() {
                             placeholder="Ürün, kategori veya marka ara..."
                             className={styles.searchInput}
                             autoFocus={isSearchOpen}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            onKeyUp={handleKey}
                         />
                         <div className={styles.searchIcon}>
                             <FiSearch />
