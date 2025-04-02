@@ -11,6 +11,7 @@ import { setSearchQuery,setSearchCategoryId,resetSearchCategoryId } from '@/redu
 import { clearAuth } from '@/redux/slices/authSlice'
 function Navbar() {
     const { data: categories, error, isLoading } = useGetMainCategoriesQuery();
+    const cartCounter = useSelector((state) => state.counter.value);
     const authValues = useSelector((state) => state.auth);
     console.log("authValues",authValues)
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -117,7 +118,7 @@ function Navbar() {
                             <Link href="/cart" className={styles.cartLink}>
                                 <FiShoppingCart className={styles.icon} />
                                 <span className={styles.cartBadge}>
-                                    0
+                                    {cartCounter}
                                 </span>
                             </Link>
                             

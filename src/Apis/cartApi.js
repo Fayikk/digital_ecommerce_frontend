@@ -7,6 +7,11 @@ export const cartApi = createApi({
     baseQuery:fetchBaseQuery({
         baseUrl:BASE_URL+"ShoppingCart",
         prepareHeaders:(headers) => {
+            const token = localStorage.getItem('token');
+            if(token){
+                headers.set('Authorization',`Bearer ${token}`);
+            }
+
             headers.set('Content-Type','application/json');
             return headers;
         }
@@ -14,7 +19,7 @@ export const cartApi = createApi({
     tagTypes:['Cart'],
     endpoints:(builder) =>({
         // https://localhost:7014/api/ShoppingCart/GetCart
-
+        //https://localhost:7014/api/ShoppingCart/AddCart
         getCart:builder.query({
             query:() => ({
                 url:`GetCart`,
@@ -22,6 +27,29 @@ export const cartApi = createApi({
             }),
             providesTags:['Cart'],
         }),
+        addCart:builder.mutation({
+            query:(productId) => ({
+                url:`AddCart?productId=${productId}`,
+                method:'POST'
+            }),
+            invalidatesTags:['Cart'],
+        }),
+        removeFromCart:builder.mutation({
+            query:(productId) => ({
+                url:`RemoveFromCart?productId=${productId}`,
+                method:'DELETE'
+            }),
+            invalidatesTags:['Cart'],
+        }),
+        removeCart:builder.mutation({
+            query:(cartId) => ({
+                url:`RemoveCart?cartId=${cartId}`,
+                method:'DELETE'
+            }),
+            invalidatesTags:['Cart'],
+        }),
+
+
 
         // getMainCategories:builder.query({
         //     query:() => 'MainCategory',
@@ -30,4 +58,4 @@ export const cartApi = createApi({
     })
 })
 
-export const {useGetCartQuery} = cartApi;
+export const {useGetCartQuery,useAddCartMutation,useRemoveFromCartMutation,useRemoveCartMutation} = cartApi;

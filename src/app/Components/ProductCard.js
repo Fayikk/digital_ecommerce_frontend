@@ -6,11 +6,15 @@ import Link from 'next/link';
 import { FiShoppingCart, FiHeart, FiStar, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import styles from './ProductCard.module.css';
 import { Domain_URL } from '@/Constants/Url';
-
+import { useAddCartMutation } from '@/Apis/cartApi';
+import { useDispatch } from 'react-redux';
+import { equalCart } from '@/redux/slices/counterSlice';
 const ProductCard = ({ product }) => {
 
 
   const [isHovered, setIsHovered] = useState(false);
+  const [AddToCart] = useAddCartMutation();
+  const dispatch = useDispatch();
   
   // Fiyat hesaplama
   const discountedPrice = product.discount 
@@ -25,6 +29,21 @@ const ProductCard = ({ product }) => {
       maximumFractionDigits: 0
     }).format(price);
   };
+
+
+  const handleAddToCart = async (productId) => {
+    
+    try {
+      const response = await AddToCart(productId).unwrap();
+      dispatch(equalCart(response.result.products.length));
+      console.log('Added to cart:', response.result.products.length);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    }
+  }
+
+
+
 
   useEffect(()=>{
     if(product && product.productImages && product.productImages.length > 0){
@@ -106,7 +125,7 @@ const ProductCard = ({ product }) => {
           <span className={styles.ratingText}>{product.rating}</span>
         </div>
         
-        <button className={styles.addToCartButton}>
+        <button className={styles.addToCartButton} onClick={()=>handleAddToCart(product.id)}>
           <FiShoppingCart className={styles.cartIcon} />
           Sepete Ekle
         </button>

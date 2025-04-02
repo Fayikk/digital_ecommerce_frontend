@@ -6,11 +6,14 @@ import Link from 'next/link'
 import styles from './Page.module.css'
 import { useGetProductDetailByIdQuery } from '@/Apis/productApi'
 import { Domain_URL } from '@/Constants/Url'
+import { useAddCartMutation } from '@/Apis/cartApi'
+import { useDispatch } from 'react-redux'
+import { equalCart } from '@/redux/slices/counterSlice'
 function ProductDetail() {
   const params = useParams();
   const { id } = params;
       const { data: productData, error, isLoading } = useGetProductDetailByIdQuery(id);
-  
+    
       
 
       if (isLoading) {
@@ -23,7 +26,7 @@ function ProductDetail() {
 
 //   const [isLoading, setIsLoading] = useState(true);
   
-
+    
 
   if (!productData) {
     return (
@@ -44,7 +47,8 @@ function ProductView({ product }) {
 //   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-
+  const [addToCart] = useAddCartMutation();
+      const dispatch = useDispatch();
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.productImages.length);
   };
@@ -52,7 +56,16 @@ function ProductView({ product }) {
   const prevImage = () => {
     setCurrentImageIndex((prev) => (prev - 1 + product.productImages.length) % product.productImages.length);
   };
-
+  const addCart = async (productId) => {
+    console.log("productId",productId);
+    try {
+      const response = await addToCart(productId).unwrap();
+      dispatch(equalCart(response.result.products.length));
+      console.log('Added to cart:', response.result.products.length);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    }
+  }
 
 //  src={`${Domain_URL}${product.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
   return (
@@ -213,7 +226,7 @@ function ProductView({ product }) {
             <div className={styles.buttonContainer}>
               <button 
                 className={styles.addToCartButton}
-                disabled={!product.inStock}
+                onClick={() => addCart(product.id)}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.buttonIcon}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
@@ -222,7 +235,6 @@ function ProductView({ product }) {
               </button>
               <button 
                 className={styles.buyNowButton}
-                disabled={!product.inStock}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.buttonIcon}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />

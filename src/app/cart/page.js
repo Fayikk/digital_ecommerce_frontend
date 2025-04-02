@@ -3,39 +3,41 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './page.module.css';
-
+import { useGetCartQuery,useRemoveFromCartMutation } from '@/Apis/cartApi';
+import { Domain_URL } from '@/Constants/Url';
+import { useDispatch } from 'react-redux';
+import { equalCart } from '@/redux/slices/counterSlice';
+import { useCheckout_stripeMutation } from '@/Apis/paymentApi';
 export default function CartPage() {
   // Sample cart data - in a real app, this would come from your global state or API
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: 'Premium Headphones',
-      price: 129.99,
-      quantity: 1,
-      image: 'https://placehold.co/100x100',
-    },
-    {
-      id: 2,
-      name: 'Wireless Mouse',
-      price: 49.99,
-      quantity: 2,
-      image: 'https://placehold.co/100x100',
-    },
-    {
-      id: 3,
-      name: 'Mechanical Keyboard',
-      price: 89.99,
-      quantity: 1,
-      image: 'https://placehold.co/100x100',
-    },
-  ]);
+
+  const {data: cartData,isLoading,error} = useGetCartQuery();
+  const dispatch = useDispatch();
+  const [removeFromCart] = useRemoveFromCartMutation();
+  const [checkoutStripe] = useCheckout_stripeMutation();
+
+  const [cartItems, setCartItems] = useState(cartData?.result.products || []);
+
+    if (error) {
+        return <div>Error: {error.message}</div>;   
+    }
+
+  useEffect(() => {
+    // Update cart items when cartData changes
+    if (cartData && cartData.result && cartData.result.products) {
+      setCartItems(cartData.result.products);
+      dispatch(equalCart(cartData.result.products.length));
+      console.log("cartItems",cartItems.length);
+    }
+  }, [cartData]);
+
 
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
     // Calculate total whenever cart items change
     const newTotal = cartItems.reduce(
-      (sum, item) => sum + item.price * item.quantity, 
+      (sum, item) => sum + item.productPrice * 1, 
       0
     );
     setTotal(newTotal);
@@ -49,16 +51,45 @@ export default function CartPage() {
     ));
   };
 
-  const removeItem = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
+  const removeItem = async (id) => {
+    console.log("removeItem",id);
+    await removeFromCart(id).then((response) => {
+      console.log("response",response);
+    })
   };
 
+
+  const handleCheckout = async () => {
+
+    const phonesArr = cartItems.map(item => ({
+      name: item.productName,
+      amount: item.productPrice * 1,
+    }))
+
+    const paymentRequest = {
+      phones: phonesArr,
+      successUrl:`http://localhost:3000/success/${cartData.result.id}`,
+      cancelUrl:'http://localhost:3000/cart',
+    }
+
+    await checkoutStripe(paymentRequest).then((response) => {
+      window.location.href = response.data.url;
+      console.log("response stripe payment",response);
+    })
+  }
+
+
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+    
+  }
   if (cartItems.length === 0) {
     return (
       <div className={styles.emptyCart}>
         <h2>Your cart is empty</h2>
         <p>Looks like you haven't added any products to your cart yet.</p>
-        <Link href="/products" className={styles.continueShopping}>
+        <Link href="/" className={styles.continueShopping}>
           Continue Shopping
         </Link>
       </div>
@@ -74,7 +105,6 @@ export default function CartPage() {
           <div className={styles.headerRow}>
             <span className={styles.productHeader}>Product</span>
             <span className={styles.priceHeader}>Price</span>
-            <span className={styles.quantityHeader}>Quantity</span>
             <span className={styles.subtotalHeader}>Subtotal</span>
             <span className={styles.actionHeader}></span>
           </div>
@@ -84,7 +114,8 @@ export default function CartPage() {
               <div className={styles.productInfo}>
                 <div className={styles.productImage}>
                   <img 
-                    src={item.image} 
+
+                    src={`${Domain_URL}${item.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`} 
                     alt={item.name}
                     width={80}
                     height={80}
@@ -92,37 +123,16 @@ export default function CartPage() {
                   />
                 </div>
                 <div className={styles.productDetails}>
-                  <h3 className={styles.productName}>{item.name}</h3>
-                  <p className={styles.productId}>Product ID: {item.id}</p>
+                  <h3 className={styles.productName}>{item.productName}</h3>
+                  <p className={styles.productId}>Description: {item.productDescription}</p>
                 </div>
               </div>
               
-              <div className={styles.price}>${item.price.toFixed(2)}</div>
+              <div className={styles.price}>₺{item.productPrice.toFixed(2)}</div>
               
-              <div className={styles.quantityControl}>
-                <button 
-                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  className={styles.quantityButton}
-                >
-                  -
-                </button>
-                <input 
-                  type="number" 
-                  min="1" 
-                  value={item.quantity} 
-                  onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)}
-                  className={styles.quantityInput}
-                />
-                <button 
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className={styles.quantityButton}
-                >
-                  +
-                </button>
-              </div>
-              
+            
               <div className={styles.subtotal}>
-                ${(item.price * item.quantity).toFixed(2)}
+              ₺{(item.productPrice * 1).toFixed(2)}
               </div>
               
               <button 
@@ -141,7 +151,7 @@ export default function CartPage() {
           
           <div className={styles.summaryRow}>
             <span>Subtotal</span>
-            <span>${total.toFixed(2)}</span>
+            <span>₺{total.toFixed(2)}</span>
           </div>
           
           <div className={styles.summaryRow}>
@@ -151,14 +161,14 @@ export default function CartPage() {
           
           <div className={styles.summaryTotal}>
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>₺{total.toFixed(2)}</span>
           </div>
           
-          <button className={styles.checkoutButton}>
+          <button className={styles.checkoutButton} onClick={handleCheckout}>
             Proceed to Checkout
           </button>
           
-          <Link href="/products" className={styles.continueShoppingLink}>
+          <Link href="/" className={styles.continueShoppingLink}>
             Continue Shopping
           </Link>
         </div>
