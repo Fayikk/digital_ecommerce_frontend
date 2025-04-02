@@ -4,90 +4,62 @@ import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import styles from './Page.module.css'
-
+import { useGetProductDetailByIdQuery } from '@/Apis/productApi'
+import { Domain_URL } from '@/Constants/Url'
 function ProductDetail() {
   const params = useParams();
   const { id } = params;
+      const { data: productData, error, isLoading } = useGetProductDetailByIdQuery(id);
   
-  const [isLoading, setIsLoading] = useState(true);
-  const [product, setProduct] = useState(null);
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setProduct({
-          id,
-          name: "iPhone 15 Pro Max",
-          price: 1299.99,
-          description: "Apple'ın en gelişmiş iPhone'u, A17 Pro çip, profesyonel kamera sistemi ve titanyum tasarım ile birlikte.",
-          features: [
-            "A17 Pro çip",
-            "6.7-inç Super Retina XDR ekran",
-            "Pro kamera sistemi: 48MP ana, ultra geniş ve telefoto",
-            "Aksiyon modu video kaydı",
-            "Titanyum tasarım"
-          ],
-          colors: [
-            { name: "Siyah Titanyum", code: "#2e2e2e" },
-            { name: "Beyaz Titanyum", code: "#f0f0f0" },
-            { name: "Mavi Titanyum", code: "#4169e1" },
-            { name: "Doğal Titanyum", code: "#a0a0a0" }
-          ],
-          images: [
-            "/images/iphone-1.jpg",
-            "/images/iphone-2.jpg",
-            "/images/iphone-3.jpg",
-            "/images/iphone-4.jpg"
-          ],
-          inStock: true
-        });
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Ürün verisi çekilirken hata oluştu:", error);
-        setIsLoading(false);
+      
+
+      if (isLoading) {
+        return (
+          <div className={styles.loaderContainer}>
+            <div className={styles.loader}></div>
+          </div>
+        );
       }
-    };
 
-    fetchData();
-  }, [id]);
+//   const [isLoading, setIsLoading] = useState(true);
+  console.log("productData",productData)
+  console.log("productData",productData?.result)    
+  
 
-  if (isLoading) {
-    return (
-      <div className={styles.loaderContainer}>
-        <div className={styles.loader}></div>
-      </div>
-    );
-  }
 
-  if (!product) {
+  if (!productData) {
     return (
       <div className={styles.notFoundContainer}>
         <h1 className={styles.notFoundTitle}>Ürün Bulunamadı</h1>
         <p className={styles.notFoundMessage}>Aradığınız ürün bulunamadı veya artık mevcut değil.</p>
-        <Link href="/products" className={styles.backLink}>
+        <Link href="/" className={styles.backLink}>
           Tüm Ürünlere Dön
         </Link>
       </div>
     );
   }
 
-  return <ProductView product={product} />;
+  return <ProductView product={productData?.result} />;
 }
 
 function ProductView({ product }) {
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+//   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+console.log("product",product.productName)
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
+    setCurrentImageIndex((prev) => (prev + 1) % product.productImages.length);
   };
   
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+    setCurrentImageIndex((prev) => (prev - 1 + product.productImages.length) % product.productImages.length);
   };
 
+  console.log("currentImageIndex",currentImageIndex)
+
+//  src={`${Domain_URL}${product.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
+  console.log(`${Domain_URL}${product.productImages[currentImageIndex].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`)
   return (
     <div className={styles.container}>
       <nav className={styles.breadcrumb}>
@@ -95,7 +67,7 @@ function ProductView({ product }) {
         <span className={styles.breadcrumbSeparator}>/</span>
         <Link href="/products" className={styles.breadcrumbLink}>Ürünler</Link>
         <span className={styles.breadcrumbSeparator}>/</span>
-        <span className={styles.breadcrumbCurrent}>{product.name}</span>
+        <span className={styles.breadcrumbCurrent}>{product.productName}</span>
       </nav>
       
       <div className={styles.productCard}>
@@ -103,22 +75,28 @@ function ProductView({ product }) {
           <div className={styles.imageContainer}>
             <div className={styles.imageWrapper}>
               {/* Image component is commented out, possibly due to missing images in development */}
-              {/* <Image 
-                src={product.images[currentImageIndex]}
-                alt={`${product.name} - Görsel ${currentImageIndex + 1}`}
+              <img 
+                src={`${Domain_URL}${product.productImages[currentImageIndex].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
+                alt={`${product.productName} - Görsel ${currentImageIndex + 1}`}
                 fill
-                sizes="(max-width: 768px) 100vw, 50vw"
+                width={768}
+                height={768}
                 style={{ objectFit: 'contain' }}
                 priority={currentImageIndex === 0}
                 quality={85}
-              /> */}
+              />
               <div className={styles.placeholder}>
                 <div className={styles.placeholderIcon}>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.placeholderSvg}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                   </svg>
                 </div>
+                {
+                    product.productImages.length > 0 ? (<></>) : (
                 <p className={styles.placeholderText}>Ürün Görseli {currentImageIndex + 1}</p>
+
+                    )
+                }
               </div>
             </div>
             
@@ -142,7 +120,7 @@ function ProductView({ product }) {
             </button>
             
             <div className={styles.indicators}>
-              {product.images.map((_, idx) => (
+              {product.productImages.map((_, idx) => (
                 <button 
                   key={idx} 
                   onClick={() => setCurrentImageIndex(idx)}
@@ -151,30 +129,48 @@ function ProductView({ product }) {
                 />
               ))}
             </div>
+
+            <div className={styles.thumbnailGallery}>
+              {product.productImages.map((image, idx) => (
+                <div 
+                  key={idx}
+                  className={`${styles.thumbnail} ${idx === currentImageIndex ? styles.activeThumbnail : ''}`}
+                  onClick={() => setCurrentImageIndex(idx)}
+                >
+                  <img
+                    src={`${Domain_URL}${image.imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
+                    alt={`${product.productName} - Küçük Görsel ${idx + 1}`}
+                    width={100}
+                    height={100}
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
           
           <div className={styles.productDetails}>
             <div className="flex justify-between items-start">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{product.name}</h1>
-                <p className="text-xl font-semibold text-blue-600 mt-2">{product.price.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}</p>
+                <p className="text-xl font-semibold text-blue-600 mt-2">{product.productPrice.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}</p>
               </div>
               
               {product.inStock ? (
                 <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Stokta</span>
               ) : (
-                <span className="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Tükendi</span>
+                <span className="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">{product.productName}</span>
               )}
             </div>
             
             <div className="mt-4">
-              <p className="text-gray-700">{product.description}</p>
+              <p className="text-gray-700">{product.productDescription}</p>
             </div>
             
             <div className="mt-6">
               <h3 className="text-lg font-medium text-gray-800 mb-3">Renk</h3>
               <div className={styles.colorContainer}>
-                {product.colors.map((color) => (
+                {/* {product.colors.map((color) => (
                   <button 
                     key={color.name} 
                     onClick={() => setSelectedColor(color)}
@@ -187,7 +183,7 @@ function ProductView({ product }) {
                     />
                     <span className={styles.colorName}>{color.name}</span>
                   </button>
-                ))}
+                ))} */}
               </div>
             </div>
             
@@ -243,9 +239,9 @@ function ProductView({ product }) {
             <div className="mt-8 border-t pt-6 border-gray-200">
               <h3 className="text-lg font-medium text-gray-800 mb-3">Özellikler</h3>
               <ul className="list-disc list-inside space-y-2 text-gray-700">
-                {product.features.map((feature, idx) => (
+                {/* {product.features.map((feature, idx) => (
                   <li key={idx}>{feature}</li>
-                ))}
+                ))} */}
               </ul>
             </div>
           </div>

@@ -4,6 +4,7 @@ import ProductCard from './Components/ProductCard';
 import styles from './page.module.css';
 import { useGetProductWithPaginationMutation } from "@/Apis/productApi";
 import { useEffect, useState } from "react";
+import { resetSearchCategoryId } from "@/redux/slices/searchSlice";
 export default function Home() {
   const counter = useSelector((state) => state.counter.value); 
   const dispatch = useDispatch();
@@ -17,7 +18,13 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
     const searchValue = useSelector((state) => state.searchQuery.value);
+    const categoryId = useSelector((state) => state.searchQuery.categoryId);
   const [getProductWithPagination] = useGetProductWithPaginationMutation(paginationModel);
+
+
+  useEffect(() => {
+    dispatch(resetSearchCategoryId())
+  },[])
 
 
   useEffect(()=>{
@@ -27,6 +34,15 @@ export default function Home() {
       pageNumber: 1
     })
   },[searchValue])
+
+  useEffect(()=>{
+    console.log("change categoryId",categoryId)
+    setPaginationModel({
+      ...paginationModel,
+      pageNumber: 1,
+      categoryId: categoryId
+    })
+  },[categoryId])
 
  
   useEffect(() => {
@@ -143,7 +159,6 @@ export default function Home() {
     <div className={styles.container}>
       <h1 className={styles.title}>Telefonlar</h1>
       <p className={styles.subtitle}>En yeni ve popüler modeller</p>
-      
       <div className={styles.productGrid}>
         {product.map((phone) => (
           <ProductCard key={phone.id} product={phone} />

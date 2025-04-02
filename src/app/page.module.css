@@ -186,6 +186,18 @@ a.secondary {
   margin-bottom: 2rem;
 }
 
+.nonfilteredTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #371f25;
+}
+.nonfilteredSubtitle {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
 .productGrid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);

@@ -1,0 +1,130 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to right, #f6f9fc, #eef1f5);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 1rem;
+}
+
+.loginCard {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 400px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.loginCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  color: #555;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid #e0e0e0;
+  background-color: #fafafa;
+  color: #333;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.input:hover {
+  border-color: #d0d0d0;
+}
+
+.button {
+  width: 100%;
+  padding: 0.875rem;
+  margin-top: 0.5rem;
+  background: #4f46e5;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background: #4338ca;
+  transform: translateY(-2px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.signupText {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.signupLink {
+  color: #4f46e5;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.signupLink:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .loginCard {
+    padding: 2rem 1.5rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+}

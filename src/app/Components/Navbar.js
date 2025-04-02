@@ -7,7 +7,7 @@ import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX } from 'react-icons/fi'
 import styles from './Navbar.module.css'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
-import { setSearchQuery } from '@/redux/slices/searchSlice'
+import { setSearchQuery,setSearchCategoryId,resetSearchCategoryId } from '@/redux/slices/searchSlice'
 function Navbar() {
     const { data: categories, error, isLoading } = useGetMainCategoriesQuery();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,6 +22,16 @@ function Navbar() {
         setIsSearchOpen(!isSearchOpen);
     }
 
+    const handleSubMenuClick = (categoryId) => {
+        console.log("trigger categoryId",categoryId)
+        dispatch(setSearchCategoryId(categoryId))
+    }
+
+    const reset = () => {
+        console.log("trigger reset")
+        dispatch(resetSearchCategoryId());
+    
+    }
 
     const handleKey = (e) => {
         e.preventDefault();
@@ -60,7 +70,7 @@ console.log(isMenuOpen)
                     <div className={styles.navbarContent}>
                         {/* Logo */}
                         <div className={styles.logoContainer}>
-                            <Link href="/" className={styles.logoLink}>
+                            <Link href="/" onClick={()=>    reset()} className={styles.logoLink}>
                                 <div className={styles.logoWrapper}>
                                     <div className={styles.logoImage}>
                                         LOGO
@@ -82,13 +92,13 @@ console.log(isMenuOpen)
                                             {category.subCategories && category.subCategories.length > 0 && (
                                                 <div className={styles.subCategoryDropdown}>
                                                     {category.subCategories.map((subCategory) => (
-                                                        <Link 
-                                                            href={`/category/${subCategory.id}`} 
+                                                        <a 
                                                             key={subCategory.id}
                                                             className={styles.subCategoryLink}
+                                                            onClick={()=> handleSubMenuClick(subCategory.id)}
                                                         >
                                                             {subCategory.categoryName}
-                                                        </Link>
+                                                        </a>
                                                     ))}
                                                 </div>
                                             )}
