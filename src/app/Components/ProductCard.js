@@ -9,7 +9,6 @@ import { Domain_URL } from '@/Constants/Url';
 
 const ProductCard = ({ product }) => {
 
-  console.log("trigger product card",product);
 
   const [isHovered, setIsHovered] = useState(false);
   
@@ -28,9 +27,6 @@ const ProductCard = ({ product }) => {
   };
 
   useEffect(()=>{
-    console.log(product)
-    console.log(product.productImages)
-    console.log(product.productImages.length)
     if(product && product.productImages && product.productImages.length > 0){
     }
   },[product])

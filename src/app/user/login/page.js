@@ -2,15 +2,51 @@
 import React, { useState } from 'react';
 import styles from './page.module.css';
 import Link from 'next/link';
+import { useSignInMutation } from '@/Apis/userApi';
+import { jwtDecode } from 'jwt-decode';
+import { useDispatch } from 'react-redux';
+import { setAuth } from '@/redux/slices/authSlice';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const [SignIn] = useSignInMutation();
 
-  const handleSubmit = (e) => {
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle login logic here
-    console.log('Login attempt with:', { email, password });
+
+    await SignIn({ email, password })
+      .unwrap()
+      .then((response) => {
+        // Handle successful login response
+
+        if (response.success) {
+          localStorage.setItem('token', response.result.token);
+          const decoedToken = jwtDecode(response.result.token);
+          dispatch(setAuth({
+            id: decoedToken.nameid,
+            name: decoedToken.unique_name,
+            email: decoedToken.unique_name,
+            role: decoedToken.role,
+            token: response.result.token,
+            isAuthenticated: true,
+          }));
+          router.push('/'); // Redirect to home page or any other page
+        }
+
+        // Redirect or perform any other action
+      })
+      .catch((error) => {
+        // Handle error response
+        console.error('Login failed:', error);
+      });
+
   };
 
   return (

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
+import { useSignUpMutation } from '@/Apis/userApi';
 
 export default function Register() {
   const router = useRouter();
@@ -15,6 +16,10 @@ export default function Register() {
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+
+
+  const [SignUp] = useSignUpMutation();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -26,48 +31,55 @@ export default function Register() {
   const validate = () => {
     const errors = {};
     
-    if (!formData.name.trim()) {
-      errors.name = "Name is required";
-    }
+    // if (!formData.name.trim()) {
+    //   errors.name = "Name is required";
+    // }
     
-    if (!formData.email) {
-      errors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = "Email is invalid";
-    }
+    // if (!formData.email) {
+    //   errors.email = "Email is required";
+    // } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    //   errors.email = "Email is invalid";
+    // }
     
-    if (!formData.password) {
-      errors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      errors.password = "Password must be at least 6 characters";
-    }
+    // if (!formData.password) {
+    //   errors.password = "Password is required";
+    // } else if (formData.password.length < 6) {
+    //   errors.password = "Password must be at least 6 characters";
+    // }
     
-    if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = "Passwords do not match";
-    }
+    // if (formData.password !== formData.confirmPassword) {
+    //   errors.confirmPassword = "Passwords do not match";
+    // }
     
-    return errors;
+    // return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validate();
     
-    if (Object.keys(errors).length === 0) {
       setIsSubmitting(true);
       try {
         // Here you would add your API call to register the user
         // For example: await api.post('/register', formData);
-        
-        router.push('/user/login');
+        await SignUp(formData).then((res) => {
+          if (res.data.success) {
+            router.push('/user/login');
+          } else {
+
+            const errorMessages = res.data.message.reduce((acc,curr) => {
+              acc.general = [...(acc.general || []), curr]
+              return acc;
+            },{});
+            setFormErrors(errorMessages);
+          }
+        })
+        // router.push('/user/login');
       } catch (error) {
         console.error("Registration error:", error);
       } finally {
         setIsSubmitting(false);
       }
-    } else {
-      setFormErrors(errors);
-    }
   };
 
   return (
@@ -86,6 +98,17 @@ export default function Register() {
 
       <div className={styles.formContainer}>
         <div className={styles.formCard}>
+    {
+      formErrors.general && (
+        <div  > 
+        {formErrors.general.map((error,index) => (
+          <p key={index} className={styles.errorText}>{error}</p>
+        ))}
+</div>
+      )
+    }
+        
+
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.formGroup}>
               <label htmlFor="name" className={styles.label}>

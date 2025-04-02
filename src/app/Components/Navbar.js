@@ -3,32 +3,31 @@ import React, { useState, useEffect } from 'react'
 import { useGetMainCategoriesQuery } from '../../Apis/mainCategoryApi'
 import Link from 'next/link'
 import Image from 'next/image'
-import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX } from 'react-icons/fi'
+import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX ,FiLogOut} from 'react-icons/fi'
 import styles from './Navbar.module.css'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 import { setSearchQuery,setSearchCategoryId,resetSearchCategoryId } from '@/redux/slices/searchSlice'
+import { clearAuth } from '@/redux/slices/authSlice'
 function Navbar() {
     const { data: categories, error, isLoading } = useGetMainCategoriesQuery();
+    const authValues = useSelector((state) => state.auth);
+    console.log("authValues",authValues)
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const dispatch = useDispatch();
     const [searchQuery, setSearchValue] = useState('');
-    console.log("trigger searchQuery",searchQuery)
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const toggleSearch = () => {
-        console.log("trigger isSearchOpen",isSearchOpen)
         setIsSearchOpen(!isSearchOpen);
     }
 
     const handleSubMenuClick = (categoryId) => {
-        console.log("trigger categoryId",categoryId)
         dispatch(setSearchCategoryId(categoryId))
     }
 
     const reset = () => {
-        console.log("trigger reset")
         dispatch(resetSearchCategoryId());
     
     }
@@ -36,16 +35,11 @@ function Navbar() {
     const handleKey = (e) => {
         e.preventDefault();
         if (e.key === 'Enter') {
-        console.log("trigger Enter",searchQuery)
-
-            console.log("trigger hit enter",searchQuery)
             setSearchValue(searchQuery);
-            console.log("trigger searchQuery",searchQuery)
             dispatch(setSearchQuery(searchQuery))
         }
     }
 
-console.log(isMenuOpen)
     // Handle scroll effect for navbar
     useEffect(() => {
         const handleScroll = () => {
@@ -128,15 +122,42 @@ console.log(isMenuOpen)
                             </Link>
                             
                             {/* User menu */}
-                            <div className={styles.userMenu}>
-                                <Link href="/login" className={styles.authLink}>
-                                    Giriş Yap
-                                </Link>
-                                <span className={styles.separator}>|</span>
-                                <Link href="/register" className={styles.authLink}>
-                                    Kayıt Ol
-                                </Link>
-                            </div>
+
+                            {authValues && authValues.authValue.isAuthenticated ? (
+                                 <div className={styles.userMenu}>
+                               
+                                 <Link href="/user/profile" className={styles.authLink}>
+                                     <FiUser className={styles.authIcon} />
+                                     {authValues.authValue.email}
+                                 </Link>
+                                 <Link href="/user/orders" className={styles.authLink}>
+                                     Siparişlerim
+                                 </Link>
+                                 <button 
+                                    onClick={() =>{
+                                        dispatch(clearAuth())
+                                        localStorage.removeItem('token')
+                                    } }
+                                    className={styles.logoutButton}
+                                >
+                                    <FiLogOut className={styles.logoutIcon} />
+                                    Çıkış Yap
+                                </button>
+                             </div>):(
+                                
+                                 <div className={styles.userMenu}>
+                                 <Link href="/user/login" className={styles.authLink}>
+                                     Giriş Yap
+                                 </Link>
+                                 <span className={styles.separator}>|</span>
+                                 <Link href="/user/register" className={styles.authLink}>
+                                     Kayıt Ol
+                                 </Link>
+                             </div>
+                             )
+                            }
+
+                           
                         </div>
 
                         {/* Mobile menu button */}
@@ -218,17 +239,33 @@ console.log(isMenuOpen)
                         </div>
                     ))}
                     
-                    <div className={styles.mobileAuthSection}>
-                        <div className={styles.mobileAuthButtons}>
-                            <Link href="/login" className={styles.loginButton}>
-                                <FiUser className={styles.authIcon} />
-                                Giriş Yap
-                            </Link>
-                            <Link href="/register" className={styles.registerButton}>
-                                Kayıt Ol
-                            </Link>
-                        </div>
-                    </div>
+                    {
+                        authValues && authValues.isAuthenticated ? (
+                            <div className={styles.mobileUserSection}>
+                                <Link href="" className={styles.mobileUserLink}>
+                                    <FiUser className={styles.authIcon} />
+                                    {authValues.email}
+                                </Link>
+                                <Link href="/user/profile" className={styles.mobileUserLink}>
+                                    <FiUser className={styles.authIcon} />
+                                    Profilim
+                                </Link>
+                                <Link href="/user/orders" className={styles.mobileUserLink}>
+                                    Siparişlerim
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className={styles.mobileAuthSection}>
+                                <Link href="/user/login" className={styles.mobileLoginButton}>
+                                    Giriş Yap
+                                </Link>
+                                <Link href="/user/register" className={styles.mobileRegisterButton}>
+                                    Kayıt Ol
+                                </Link>
+                            </div>
+                        )
+                    }
+                   
                 </div>
             </div>
             

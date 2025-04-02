@@ -36,7 +36,6 @@ export default function Home() {
   },[searchValue])
 
   useEffect(()=>{
-    console.log("change categoryId",categoryId)
     setPaginationModel({
       ...paginationModel,
       pageNumber: 1,
@@ -48,12 +47,8 @@ export default function Home() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-    console.log("searchValuesearchValuesearchValue",searchValue)
-       
-        console.log("paginationModel",paginationModel)
         
         const response = await getProductWithPagination(paginationModel).unwrap();
-        console.log(response);
         setProduct(response.result.items);
         setTotalPages(Math.ceil(response.result.totalCount / paginationModel.pageSize));
         setTotalItems(response.result.totalCount);

@@ -22,8 +22,6 @@ function ProductDetail() {
       }
 
 //   const [isLoading, setIsLoading] = useState(true);
-  console.log("productData",productData)
-  console.log("productData",productData?.result)    
   
 
 
@@ -44,7 +42,6 @@ function ProductDetail() {
 
 function ProductView({ product }) {
 //   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-console.log("product",product.productName)
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
@@ -56,10 +53,8 @@ console.log("product",product.productName)
     setCurrentImageIndex((prev) => (prev - 1 + product.productImages.length) % product.productImages.length);
   };
 
-  console.log("currentImageIndex",currentImageIndex)
 
 //  src={`${Domain_URL}${product.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
-  console.log(`${Domain_URL}${product.productImages[currentImageIndex].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`)
   return (
     <div className={styles.container}>
       <nav className={styles.breadcrumb}>

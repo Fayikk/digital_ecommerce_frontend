@@ -17,7 +17,28 @@
   background-color: #ffffff;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0;
+  transition: color 0.2s;
+}
 
+.logoutButton:hover {
+  color: #dc2626;
+}
+
+.logoutIcon {
+  height: 1rem;
+  width: 1rem;
+}
 .container {
   width: 100%;
   max-width: 1280px;
