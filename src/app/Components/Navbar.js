@@ -131,7 +131,7 @@ function Navbar() {
                                      <FiUser className={styles.authIcon} />
                                      {authValues.authValue.email}
                                  </Link>
-                                 <Link href="/user/orders" className={styles.authLink}>
+                                 <Link href="/order" className={styles.authLink}>
                                      Siparişlerim
                                  </Link>
                                  <button 
@@ -251,7 +251,7 @@ function Navbar() {
                                     <FiUser className={styles.authIcon} />
                                     Profilim
                                 </Link>
-                                <Link href="/user/orders" className={styles.mobileUserLink}>
+                                <Link href="/order" className={styles.mobileUserLink}>
                                     Siparişlerim
                                 </Link>
                             </div>

@@ -7,6 +7,7 @@ import { FaCheckCircle } from 'react-icons/fa';
 import styles from './page.module.css';
 import { useDispatch } from 'react-redux';
 import { equalCart } from '@/redux/slices/counterSlice';
+import { useCreateOrderMutation } from '@/Apis/orderApi';
 
 function SuccessPage() {
     const params = useParams();
@@ -14,6 +15,7 @@ function SuccessPage() {
     const router = useRouter();
     const dispatch = useDispatch();
     const [removeCart] = useRemoveCartMutation();
+    const [createOrder] = useCreateOrderMutation();
     const [orderDetails, setOrderDetails] = useState({
         orderNumber: `ORD-${Math.floor(100000 + Math.random() * 900000)}`,
         orderDate: new Date().toLocaleDateString(),
@@ -25,12 +27,17 @@ function SuccessPage() {
         const clearCart = async () => {
             try {
                 // Clear the cart after successful payment
-                await removeCart(id).then((response) => {
-                    console.log("Cart cleared successfully", response);
-                    // Update cart count in Redux store to 0
-                    dispatch(equalCart(0));
-                    setIsLoading(false);
-                });
+
+                await createOrder().then((response) => {
+                     removeCart(id).then((response) => {
+                        console.log("Cart cleared successfully", response);
+                        // Update cart count in Redux store to 0
+                        dispatch(equalCart(0));
+                        setIsLoading(false);
+                    });
+                    console.log("Order created successfully", response);});
+
+           
             } catch (error) {
                 console.error("Error clearing cart:", error);
                 setIsLoading(false);

@@ -10,6 +10,7 @@ import { productApi } from "@/Apis/productApi";
 import { userApi } from "@/Apis/userApi";
 import { cartApi } from "@/Apis/cartApi";
 import { paymentApi } from "@/Apis/paymentApi";
+import { orderApi } from "@/Apis/orderApi";
 
 const persistConfig = {
     key: "root",
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
    [userApi.reducerPath]: userApi.reducer,
    [cartApi.reducerPath]: cartApi.reducer,
    [paymentApi.reducerPath]: paymentApi.reducer,
+   [orderApi.reducerPath]: orderApi.reducer,
 });
 
 
@@ -36,7 +38,7 @@ export const store = configureStore({
             serializableCheck: {
                 ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
             },
-        }).concat(mainCategoryApi.middleware,productApi.middleware,userApi.middleware,cartApi.middleware,paymentApi.middleware),
+        }).concat(mainCategoryApi.middleware,orderApi.middleware,productApi.middleware,userApi.middleware,cartApi.middleware,paymentApi.middleware),
 });
 
 export const persistor = persistStore(store);

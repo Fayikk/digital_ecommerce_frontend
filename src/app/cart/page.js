@@ -8,6 +8,7 @@ import { Domain_URL } from '@/Constants/Url';
 import { useDispatch } from 'react-redux';
 import { equalCart } from '@/redux/slices/counterSlice';
 import { useCheckout_stripeMutation } from '@/Apis/paymentApi';
+import { useCreateOrderMutation } from '@/Apis/orderApi';
 export default function CartPage() {
   // Sample cart data - in a real app, this would come from your global state or API
 
@@ -16,7 +17,7 @@ export default function CartPage() {
   const [removeFromCart] = useRemoveFromCartMutation();
   const [checkoutStripe] = useCheckout_stripeMutation();
 
-  const [cartItems, setCartItems] = useState(cartData?.result.products || []);
+  const [cartItems, setCartItems] = useState( []);
 
     if (error) {
         return <div>Error: {error.message}</div>;   
