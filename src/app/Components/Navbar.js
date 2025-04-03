@@ -11,9 +11,26 @@ import { setSearchQuery,setSearchCategoryId,resetSearchCategoryId } from '@/redu
 import { clearAuth } from '@/redux/slices/authSlice'
 function Navbar() {
     const { data: categories, error, isLoading } = useGetMainCategoriesQuery();
+    const [isAdmin,setIsAdmin] = useState(false)
     const cartCounter = useSelector((state) => state.counter.value);
     const authValues = useSelector((state) => state.auth);
     console.log("authValues",authValues)
+
+
+    useEffect(()=>{
+        if (authValues && authValues.authValue.role !== null && Array.isArray(authValues.authValue.role)) {
+            authValues.authValue.role.map((item,i) =>{
+               if(item === 'Admin'){
+                console.log("user role",item)
+                setIsAdmin(true)    
+            } })
+        }
+        else {
+            setIsAdmin(false);
+        }
+    },[authValues])
+
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
@@ -131,6 +148,14 @@ function Navbar() {
                                      <FiUser className={styles.authIcon} />
                                      {authValues.authValue.email}
                                  </Link>
+                                {
+                                    isAdmin ? (
+                                        <Link href="/admin" className={styles.authLink}>
+                                            <FiUser className={styles.authIcon} />
+                                            Admin Paneli
+                                        </Link>
+                                    ) : null
+                                }
                                  <Link href="/order" className={styles.authLink}>
                                      Siparişlerim
                                  </Link>

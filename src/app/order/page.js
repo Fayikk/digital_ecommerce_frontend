@@ -3,53 +3,37 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaBox, FaShippingFast, FaCheckCircle, FaDownload } from 'react-icons/fa';
 import styles from './page.module.css';
-
+import { useGetUserOrdersQuery } from '@/Apis/orderApi';
+import { Domain_URL } from '@/Constants/Url';
 export default function OrderPage() {
   const [orders, setOrders] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
-  
-  // Example data - in a real app, this would come from your API
+
+  const { data: orderData, isLoading, error } = useGetUserOrdersQuery();
+    console.log("orderData",orderData);
+  // Update orders when API data is received
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setOrders([
-        {
-          id: 'ORD-123456',
-          date: '2023-06-15',
-          total: 459.97,
-          status: 'delivered',
-          items: [
-            { id: 1, name: 'Smartphone XYZ', price: 299.99, quantity: 1, image: 'https://placehold.co/60x60' },
-            { id: 2, name: 'Wireless Earbuds', price: 79.99, quantity: 2, image: 'https://placehold.co/60x60' },
-          ]
-        },
-        {
-          id: 'ORD-123457',
-          date: '2023-06-10',
-          total: 129.99,
-          status: 'processing',
-          items: [
-            { id: 3, name: 'Bluetooth Speaker', price: 129.99, quantity: 1, image: 'https://placehold.co/60x60' }
-          ]
-        },
-        {
-          id: 'ORD-123458',
-          date: '2023-06-05',
-          total: 349.98,
-          status: 'shipped',
-          items: [
-            { id: 4, name: 'Tablet Pro', price: 349.98, quantity: 1, image: 'https://placehold.co/60x60' }
-          ]
-        }
-      ]);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+    if (orderData && orderData.result) {
+      setOrders(orderData.result);
+    }
+  }, [orderData]);
+
+  // Since the new structure doesn't have status field, we'll use a placeholder
+  // In a real application, you might want to add logic based on dates or another field
+  const getOrderStatus = (order) => {
+    // Just as an example - in a real app you would have actual status logic
+    const createdDate = new Date(order.createdAt);
+    const now = new Date();
+    const daysDiff = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
+    
+    if (daysDiff < 2) return 'processing';
+    if (daysDiff < 5) return 'shipped';
+    return 'delivered';
+  };
 
   const filteredOrders = activeTab === 'all' 
     ? orders 
-    : orders.filter(order => order.status === activeTab);
+    : orders.filter(order => getOrderStatus(order) === activeTab);
 
   const getStatusIcon = (status) => {
     switch(status) {
@@ -77,11 +61,25 @@ export default function OrderPage() {
     }
   };
 
+  // Calculate total for an order
+  const calculateOrderTotal = (products) => {
+    console.log("productscalculateOrderTotal",products);
+    return products.reduce((sum, product) => sum + (product.productPrice * 1), 0);
+  };
+
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingSpinner}></div>
         <p>Loading your orders...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.errorContainer}>
+        <p>Error loading orders. Please try again later.</p>
       </div>
     );
   }
@@ -131,70 +129,75 @@ export default function OrderPage() {
         </div>
       ) : (
         <div className={styles.ordersList}>
-          {filteredOrders.map((order) => (
-            <div key={order.id} className={styles.orderCard}>
-              <div className={styles.orderHeader}>
-                <div className={styles.orderInfo}>
-                  <div className={styles.orderIdWrapper}>
-                    <span className={styles.orderIdLabel}>Order</span>
-                    <span className={styles.orderId}>{order.id}</span>
-                  </div>
-                  <div className={styles.orderDate}>
-                    Placed on {new Date(order.date).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
-                  </div>
-                </div>
-                <div className={styles.orderStatus}>
-                  {getStatusIcon(order.status)}
-                  <span className={styles.statusText}>{getStatusText(order.status)}</span>
-                </div>
-              </div>
-              
-              <div className={styles.orderItems}>
-                {order.items.map((item) => (
-                  <div key={item.id} className={styles.orderItem}>
-                    <div className={styles.itemImage}>
-                      <img 
-                        src={item.image} 
-                        alt={item.name} 
-                        width={60} 
-                        height={60} 
-                      />
+          {filteredOrders.map((order) => {
+            const orderStatus = getOrderStatus(order);
+            const orderTotal = calculateOrderTotal(order.products);
+            
+            return (
+              <div key={order.id} className={styles.orderCard}>
+                <div className={styles.orderHeader}>
+                  <div className={styles.orderInfo}>
+                    <div className={styles.orderIdWrapper}>
+                      <span className={styles.orderIdLabel}>Order</span>
+                      <span className={styles.orderId}>{order.id.substring(0, 8)}</span>
                     </div>
-                    <div className={styles.itemDetails}>
-                      <h3 className={styles.itemName}>{item.name}</h3>
-                      <div className={styles.itemMeta}>
-                        <span className={styles.itemPrice}>₺{item.price.toFixed(2)}</span>
-                        <span className={styles.itemQuantity}>Qty: {item.quantity}</span>
+                    <div className={styles.orderDate}>
+                      Placed on {new Date(order.createdAt).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </div>
+                  </div>
+                  <div className={styles.orderStatus}>
+                    {getStatusIcon(orderStatus)}
+                    <span className={styles.statusText}>{getStatusText(orderStatus)}</span>
+                  </div>
+                </div>
+                <div className={styles.orderItems}>
+                  {order.products.map((item, index) => (
+                    <div key={index} className={styles.orderItem}>
+                      <div className={styles.itemImage}>
+                        <img 
+                          src={`${Domain_URL}${item.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`
+                        } 
+                          alt={item.name} 
+                          width={60} 
+                          height={60} 
+                        />
+                      </div>
+                      <div className={styles.itemDetails}>
+                        <h3 className={styles.itemName}>{item.name}</h3>
+                        <div className={styles.itemMeta}>
+                          <span className={styles.itemPrice}>₺{item.productPrice?.toFixed(2) || '0.00'}</span>
+                          <span className={styles.itemQuantity}>Qty: {item.quantity}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-              
-              <div className={styles.orderFooter}>
-                <div className={styles.orderTotal}>
-                  <span className={styles.totalLabel}>Total:</span>
-                  <span className={styles.totalAmount}>₺{order.total.toFixed(2)}</span>
+                  ))}
                 </div>
                 
-                <div className={styles.orderActions}>
-                  <Link href={`/order/${order.id}`} className={styles.viewDetailsButton}>
-                    View Details
-                  </Link>
-                  {order.status === 'delivered' && (
-                    <button className={styles.invoiceButton}>
-                      <FaDownload size={14} />
-                      <span>Invoice</span>
-                    </button>
-                  )}
+                <div className={styles.orderFooter}>
+                  <div className={styles.orderTotal}>
+                    <span className={styles.totalLabel}>Total:</span>
+                    <span className={styles.totalAmount}>₺{orderTotal.toFixed(2)}</span>
+                  </div>
+                  
+                  <div className={styles.orderActions}>
+                    <Link href={`/product/${order.id}`} className={styles.viewDetailsButton}>
+                      View Details
+                    </Link>
+                    {orderStatus === 'delivered' && (
+                      <button className={styles.invoiceButton}>
+                        <FaDownload size={14} />
+                        <span>Invoice</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       
