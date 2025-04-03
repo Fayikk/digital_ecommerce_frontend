@@ -16,8 +16,16 @@ export const mainCategoryApi = createApi({
         getMainCategories:builder.query({
             query:() => 'MainCategory',
             providesTags:['MainCategory'],
-        })
+        }),
+        addMainCategory:builder.mutation({
+            query:(body) => ({
+                url:'MainCategory',
+                method:'POST',
+                body,
+            }),
+            invalidatesTags:['MainCategory'],
+        }),
     })
 })
 
-export const {useGetMainCategoriesQuery} = mainCategoryApi;
+export const {useGetMainCategoriesQuery,useAddMainCategoryMutation} = mainCategoryApi;

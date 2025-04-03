@@ -1,12 +1,26 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './page.module.css';
 import { FaPlus, FaLayerGroup, FaTags, FaMobileAlt, FaImages, FaSave } from 'react-icons/fa';
-
+import { useAddMainCategoryMutation,useGetMainCategoriesQuery } from '@/Apis/mainCategoryApi';
+import {useAddSubCategoryMutation} from '@/Apis/subCategoryApi';
+import { useGetSubCategoriesQuery } from '@/Apis/subCategoryApi';
+import { useAddProductMutation, useGetAllProductsQuery } from '@/Apis/productApi';
+import { useAddProductImageMutation } from '@/Apis/productImageApi';
+import toast from 'react-hot-toast';
 export default function AdminPanel() {
   // State for active tab
+  const [mainCategoriesData, setMainCategoriesData] = useState([]);
+    const [subCategoriesData, setSubCategoriesData] = useState([]);
+    const [phonesDataValue, setPhonesData] = useState([]);
   const [activeTab, setActiveTab] = useState('mainCategory');
-  
+  const [addMainCategory] = useAddMainCategoryMutation();
+  const [addSubCategory] = useAddSubCategoryMutation();
+  const [addPhone] = useAddProductMutation();
+  const [addProductImage] = useAddProductImageMutation();
+  const {data:mainCategories,isLoading,error}  = useGetMainCategoriesQuery();
+  const {data:subCategories,isLoadingSubCategory,errorSubCategory} = useGetSubCategoriesQuery();
+  const {data:phonesData,isLoadingPhones,errorPhones} = useGetAllProductsQuery();
   // Form states
   const [mainCategory, setMainCategory] = useState({
     categoryName: '',
@@ -27,49 +41,109 @@ export default function AdminPanel() {
     color: 0,
     subCategoryId: ''
   });
+console.log("phonesData",phonesData);
+
+  useEffect(()=>{
+    if(mainCategories && subCategories && phonesData){
+        setMainCategoriesData(mainCategories.result);
+        setSubCategoriesData(subCategories.result);
+        setPhonesData(phonesData.result);
+    }
+  },[])
+
+
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading main categories</div>;{
+    
+  }
+  if (isLoadingSubCategory) return <div>Loading...</div>;
+  if (errorSubCategory) return <div>Error loading sub categories</div>;{
+    
+  }
+  console.log("mainCategories",mainCategories);
+  console.log("subCategories",subCategories);
+
+
   
   const [productImages, setProductImages] = useState([]);
   const [selectedProductId, setSelectedProductId] = useState('');
 
   // Mock data for dropdowns - in real implementation, these would come from API
-  const mockMainCategories = [
-    { id: '3fa85f64-5717-4562-b3fc-2c963f66afa6', name: 'Smartphones' },
-    { id: '4fa85f64-5717-4562-b3fc-2c963f66afa7', name: 'Accessories' }
-  ];
+  const mockMainCategories = mainCategoriesData.map((category) => ({
+    id: category.id,
+    name: category.categoryName
+  }));
   
-  const mockSubCategories = [
-    { id: '5fa85f64-5717-4562-b3fc-2c963f66afa8', name: 'Android Phones' },
-    { id: '6fa85f64-5717-4562-b3fc-2c963f66afa9', name: 'iOS Phones' }
-  ];
+  const mockSubCategories = subCategoriesData.map((category) => ({
+    id: category.id,
+    name: category.categoryName
+  }));
   
-  const mockProducts = [
-    { id: '7fa85f64-5717-4562-b3fc-2c963f66afb0', name: 'Samsung Galaxy S21' },
-    { id: '8fa85f64-5717-4562-b3fc-2c963f66afb1', name: 'iPhone 13' }
-  ];
+  const mockProducts = phonesDataValue.map((product) => ({
+    id: product.id,
+    name: product.productName
+  }));
 
   // Handle form submissions
-  const handleMainCategorySubmit = (e) => {
+  const handleMainCategorySubmit = async (e) => {
     e.preventDefault();
+    console.log('Main Category Form Submitted:', mainCategory);
+    await addMainCategory(mainCategory).unwrap()
+      .then((response) => {
+        console.log('Main Category added:', response);
+        toast.success('Main Category added successfully!');
+        setMainCategory({ categoryName: '', categoryDescription: '' });
+      })
+      .catch((error) => {
+        console.error('Error adding main category:', error);
+      });
     console.log('Main Category Form Submitted:', mainCategory);
     // Here you would add API call to save the main category
   };
 
-  const handleSubCategorySubmit = (e) => {
+  const handleSubCategorySubmit = async (e) => {
     e.preventDefault();
+    await addSubCategory(subCategory).unwrap()
+      .then((response) => {
+        console.log('Sub Category added:', response);
+        toast.success('Sub Category added successfully!');
+        setSubCategory({ categoryName: '', categoryDescription: '', mainCategoryId: '' });
+      })
+      .catch((error) => {
+        console.error('Error adding sub category:', error);
+      });
     console.log('Sub Category Form Submitted:', subCategory);
     // Here you would add API call to save the sub category
   };
 
-  const handleProductSubmit = (e) => {
+  const handleProductSubmit = async (e) => {
     e.preventDefault();
+    await addPhone(product).unwrap()
+      .then((response) => {
+        console.log('Product added:', response);
+        toast.success('Product added successfully!');
+        setProduct({ productName: '', productPrice: 0, productDescription: '', productStock: 0, color: 0, subCategoryId: '' });
+      })
     console.log('Product Form Submitted:', product);
     // Here you would add API call to save the product
   };
 
-  const handleProductImageSubmit = (e) => {
+  const handleProductImageSubmit = async (e) => {
     e.preventDefault();
     console.log('Product Images Submitted:', productImages);
     console.log('For Product ID:', selectedProductId);
+    
+    await addProductImage({ productId: selectedProductId, file: productImages }).unwrap()
+      .then((response) => {
+        console.log('Product images added:', response);
+        toast.success('Product images added successfully!');
+        setProductImages([]);
+        setSelectedProductId('');
+      })
+      .catch((error) => {
+        console.error('Error adding product images:', error);
+      });
     // Here you would add API call to save the product images
   };
 

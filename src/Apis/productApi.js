@@ -28,7 +28,22 @@ export const productApi = createApi({
             }),
             providesTags:['MainCategory'],
         }),
+        addProduct:builder.mutation({
+            query:(body) => ({
+                url:'/Create',
+                method:'POST',
+                body,
+            }),
+            invalidatesTags:['MainCategory'],
+        }),
+        getAllProducts:builder.query({
+            query:() => ({
+                url:'/GetAll',
+                method:'GET',
+            }),
+            providesTags:['MainCategory'],
+        }),
     })
 })
 
-export const {useGetProductWithPaginationMutation,useGetProductDetailByIdQuery} = productApi;
+export const {useGetProductWithPaginationMutation,useGetAllProductsQuery,useGetProductDetailByIdQuery,useAddProductMutation} = productApi;

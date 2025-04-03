@@ -9,6 +9,7 @@ import { Domain_URL } from '@/Constants/Url'
 import { useAddCartMutation } from '@/Apis/cartApi'
 import { useDispatch } from 'react-redux'
 import { equalCart } from '@/redux/slices/counterSlice'
+import toast from 'react-hot-toast'
 function ProductDetail() {
   const params = useParams();
   const { id } = params;
@@ -57,6 +58,7 @@ function ProductView({ product }) {
     setCurrentImageIndex((prev) => (prev - 1 + product.productImages.length) % product.productImages.length);
   };
   const addCart = async (productId) => {
+    toast.success('Ürün sepete eklendi!');
     console.log("productId",productId);
     try {
       const response = await addToCart(productId).unwrap();

@@ -2,6 +2,7 @@
 import { Inter, Roboto_Mono } from 'next/font/google';
 import ReduxProvider from "../components/ReduxProvider";
 import Navbar from './Components/Navbar';
+import { Toaster } from 'react-hot-toast';
 
 const sans = Inter({
   variable: "--font-sans",
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <body>
+        <Toaster position='top-right' />
         <ReduxProvider>
           {children}
         </ReduxProvider>

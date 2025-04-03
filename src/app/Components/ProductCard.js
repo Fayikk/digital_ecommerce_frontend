@@ -9,6 +9,7 @@ import { Domain_URL } from '@/Constants/Url';
 import { useAddCartMutation } from '@/Apis/cartApi';
 import { useDispatch } from 'react-redux';
 import { equalCart } from '@/redux/slices/counterSlice';
+import toast from 'react-hot-toast';
 const ProductCard = ({ product }) => {
 
 
@@ -35,6 +36,7 @@ const ProductCard = ({ product }) => {
     
     try {
       const response = await AddToCart(productId).unwrap();
+      toast.success('Ürün sepete eklendi!');
       dispatch(equalCart(response.result.products.length));
       console.log('Added to cart:', response.result.products.length);
     } catch (error) {
@@ -68,15 +70,29 @@ const ProductCard = ({ product }) => {
         )}
         <Link href={`/product/${product.id}`} className={styles.imageLink}>
           <div className={styles.imageWrapper}>
-          <img
-              src={`${Domain_URL}${product.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
 
+        {
+          product.productImages.length > 0 && product.productImages[0].imageUrl && (
+            <img
+              src={`${Domain_URL}${product.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
               alt={product.name}
               width={300}
               height={300}
               priority
               className={styles.productImage}
             />
+          )} 
+          {product.productImages.length === 0 && (
+            <img
+              src="https://clipground.com/images/cell-phones-clipart-12.jpg"
+              alt="Default Product"
+              width={300}
+              height={300}
+              priority
+              className={styles.productImage}
+            />
+          )}
+
           </div>
         </Link>
         
