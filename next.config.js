@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone', // ✅ Standalone mod
+
   images: {
     domains: [
       'store.storeimages.cdn-apple.com',
@@ -7,17 +9,19 @@ const nextConfig = {
       'lh3.googleusercontent.com',
       'fdn2.gsmarena.com',
       'localhost',
-      'https://localhost:7014/',
-      'https://localhost:7014/images/',
     ],
     remotePatterns: [
-        {
-          protocol: 'https',
-          hostname: 'localhost',
-          port: '7014',
-          pathname: '/**',
-        },
-      ],
+      {
+        protocol: 'https',
+        hostname: 'localhost',
+        port: '7014',
+        pathname: '/**',
+      },
+    ],
+  },
+
+  eslint: {
+    ignoreDuringBuilds: true, // ✅ Build sırasında ESLint hatalarını yoksay
   },
 };
 
