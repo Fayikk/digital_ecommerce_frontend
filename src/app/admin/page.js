@@ -8,7 +8,8 @@ import { useGetSubCategoriesQuery } from '@/Apis/subCategoryApi';
 import { useAddProductMutation, useGetAllProductsQuery } from '@/Apis/productApi';
 import { useAddProductImageMutation } from '@/Apis/productImageApi';
 import toast from 'react-hot-toast';
-export default function AdminPanel() {
+import ChekcAdminControl from '@/Wrappers/HoC/CheckAdminControl';
+function AdminPanel() {
   // State for active tab
   const [mainCategoriesData, setMainCategoriesData] = useState([]);
     const [subCategoriesData, setSubCategoriesData] = useState([]);
@@ -429,3 +430,5 @@ console.log("phonesData",phonesData);
     </div>
   );
 }
+
+export default ChekcAdminControl(AdminPanel);
