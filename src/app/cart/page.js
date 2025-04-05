@@ -114,14 +114,30 @@ export default function CartPage() {
             <div key={item.id} className={styles.cartItem}>
               <div className={styles.productInfo}>
                 <div className={styles.productImage}>
-                  <img 
 
-                    src={`${Domain_URL}${item.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`} 
-                    alt={item.name}
-                    width={80}
-                    height={80}
-                    className={styles.image}
-                  />
+
+                {
+          item.productImages.length > 0 && item.productImages[0].imageUrl && (
+            <img
+              src={`${Domain_URL}${item.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
+              alt={item.name}
+              width={300}
+              height={300}
+              priority
+              className={styles.image}
+            />
+          )} 
+          {item.productImages.length === 0 && (
+            <img
+              src="https://clipground.com/images/cell-phones-clipart-12.jpg"
+              alt="Default Product"
+              width={300}
+              height={300}
+              priority
+              className={styles.image}
+            />
+          )}
+
                 </div>
                 <div className={styles.productDetails}>
                   <h3 className={styles.productName}>{item.productName}</h3>
