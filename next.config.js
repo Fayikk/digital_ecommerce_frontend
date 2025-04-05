@@ -12,13 +12,12 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'localhost',
-        port: '7014',
+        hostname: 'teleferichouse.com',
+        port: '81',
         pathname: '/**',
       },
     ],
   },
-
   eslint: {
     ignoreDuringBuilds: true,
   },
