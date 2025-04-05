@@ -69,8 +69,8 @@ export default function CartPage() {
 
     const paymentRequest = {
       phones: phonesArr,
-      successUrl:`http://localhost:3000/success/${cartData.result.id}`,
-      cancelUrl:'http://localhost:3000/cart',
+      successUrl:`https://teleferichouse.com/success/${cartData.result.id}`,
+      cancelUrl:'https://teleferichouse.com/cart',
     }
 
     await checkoutStripe(paymentRequest).then((response) => {
