@@ -100,7 +100,7 @@ function SuccessPage() {
                     >
                         Continue Shopping
                     </button>
-                    <Link href="/orders" className={styles.secondaryButton}>
+                    <Link href="/order" className={styles.secondaryButton}>
                         View My Orders
                     </Link>
                 </div>
