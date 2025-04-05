@@ -158,13 +158,27 @@ export default function OrderPage() {
                   {order.products.map((item, index) => (
                     <div key={index} className={styles.orderItem}>
                       <div className={styles.itemImage}>
-                        <img 
-                          src={`${Domain_URL}${item.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`
-                        } 
-                          alt={item.name} 
-                          width={60} 
-                          height={60} 
-                        />
+
+   {
+          item.productImages.length > 0 && item.productImages[0].imageUrl && (
+            <img
+            src={`${Domain_URL}${item.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`
+          } 
+            alt={item.name} 
+            width={60} 
+            height={60} 
+            />
+          )} 
+          {item.productImages.length === 0 && (
+            <img
+              src="https://clipground.com/images/cell-phones-clipart-12.jpg"
+              alt="Default Product"
+              width={60} 
+              height={60} 
+            />
+          )}
+
+
                       </div>
                       <div className={styles.itemDetails}>
                         <h3 className={styles.itemName}>{item.name}</h3>

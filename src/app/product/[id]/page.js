@@ -85,16 +85,33 @@ function ProductView({ product }) {
           <div className={styles.imageContainer}>
             <div className={styles.imageWrapper}>
               {/* Image component is commented out, possibly due to missing images in development */}
-              <img 
-                src={`${Domain_URL}${product.productImages[currentImageIndex].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
-                alt={`${product.productName} - Görsel ${currentImageIndex + 1}`}
+
+              {
+          product.productImages.length > 0 && product.productImages[0].imageUrl && (
+            <img
+              src={`${Domain_URL}${product.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
+              alt={`${product.productName} - Görsel ${currentImageIndex + 1}`}
                 fill
                 width={768}
                 height={768}
                 style={{ objectFit: 'contain' }}
                 priority={currentImageIndex === 0}
                 quality={85}
-              />
+            />
+          )} 
+          {product.productImages.length === 0 && (
+            <img
+              src="https://clipground.com/images/cell-phones-clipart-12.jpg"
+              alt="Default Product"
+              fill
+              width={768}
+              height={768}
+              style={{ objectFit: 'contain' }}
+              priority={currentImageIndex === 0}
+              quality={85}
+            />
+          )}
+
               <div className={styles.placeholder}>
                 <div className={styles.placeholderIcon}>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.placeholderSvg}>
