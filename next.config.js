@@ -20,8 +20,11 @@ const nextConfig = {
   },
 
   eslint: {
-    ignoreDuringBuilds: true, // ✅ Build sırasında ESLint hatalarını yoksay
+    ignoreDuringBuilds: true,
   },
+  distDir: '.next',
+  generateEtags: false,
+  poweredByHeader: false,
 };
 
 module.exports = nextConfig;
