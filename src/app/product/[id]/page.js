@@ -89,7 +89,7 @@ function ProductView({ product }) {
               {
           product.productImages.length > 0 && product.productImages[0].imageUrl && (
             <img
-              src={`${Domain_URL}${product.productImages[0].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
+              src={`${Domain_URL}${product.productImages[currentImageIndex].imageUrl.replace(/^wwwroot[\\/]/, '').replace(/\\/g, '/').replace(/\s*\(\d+\)/, '')}`}
               alt={`${product.productName} - Görsel ${currentImageIndex + 1}`}
                 fill
                 width={768}
@@ -111,6 +111,10 @@ function ProductView({ product }) {
               quality={85}
             />
           )}
+
+
+
+
 
               <div className={styles.placeholder}>
                 <div className={styles.placeholderIcon}>
